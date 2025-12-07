@@ -1,12 +1,14 @@
 package com.auth.identity_service.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import lombok.*;
 
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-
+@JsonPropertyOrder({"code", "message", "data"})
 public class ApiResponse<T> {
     private int code;
     private String message;
