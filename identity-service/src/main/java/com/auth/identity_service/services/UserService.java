@@ -16,16 +16,17 @@ public class UserService {
 
     public UserResponse createUser(RegisterRequest request) {   
         //checkValidateRegisterRequest(request);
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-        userRepository.save(user);
-        System.out.println("User registered: " + user.getUsername());
+        User NewUser = new User();
+
+        NewUser.setUsername(request.getUsername());
+        NewUser.setEmail(request.getEmail());
+        NewUser.setPassword(request.getPassword());
+
+        userRepository.save(NewUser);
         return UserResponse.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
+                .id(NewUser.getId())
+                .username(NewUser.getUsername())
+                .email(NewUser.getEmail())
                 .build();
     }
 
