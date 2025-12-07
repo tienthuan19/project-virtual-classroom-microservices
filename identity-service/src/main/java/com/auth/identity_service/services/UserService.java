@@ -1,10 +1,15 @@
 package com.auth.identity_service.services;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 
 import com.auth.identity_service.dto.request.RegisterRequest;
 import com.auth.identity_service.dto.responce.UserResponse;
+import com.auth.identity_service.models.Role;
 import com.auth.identity_service.models.User;
+import com.auth.identity_service.repository.RoleRepository;
 import com.auth.identity_service.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -13,34 +18,47 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
-    public UserResponse createUser(RegisterRequest request) {   
-        //checkValidateRegisterRequest(request);
-        User NewUser = new User();
+    public UserResponse createUser(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("This Email is already in use."); 
+        }
 
-        NewUser.setUsername(request.getUsername());
-        NewUser.setEmail(request.getEmail());
-        NewUser.setPassword(request.getPassword());
+        User newUser = new User();
+        HashSet<Role> roles = new HashSet<>();
+        // 1. Set username
+        newUser.setUsername(request.getUsername());
+        // 2. Set email
+        newUser.setEmail(request.getEmail());
+        // 3. Set password (Not Hashed, Add hashing later)
+        newUser.setPassword(request.getPassword());
+        
+        if (request.getRole() != null && !request.getRole().isEmpty()) {
+            request.getRole().forEach(roleName -> {
+                Role role = roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+                roles.add(role);
+            });
+        } else {
+            Role defaultRole = roleRepository.findByName("STUDENT")
+                    .orElseThrow(() -> new RuntimeException("Error: Role STUDENT is not found."));
+            roles.add(defaultRole);
+        }
+        // 4. Set roles
+        newUser.setRoles(roles); 
+        
+        userRepository.save(newUser);
 
-        userRepository.save(NewUser);
+        Set<String> roleNames = new HashSet<>();
+        if (newUser.getRoles() != null) {
+        newUser.getRoles().forEach(role -> roleNames.add(role.getName()));
+        }
         return UserResponse.builder()
-                .id(NewUser.getId())
-                .username(NewUser.getUsername())
-                .email(NewUser.getEmail())
+                .id(newUser.getId())
+                .username(newUser.getUsername())
+                .email(newUser.getEmail())
+                .roles(roleNames)
                 .build();
     }
-
-    // private void checkValidateRegisterRequest(RegisterRequest request) {
-    //     if (request.getUsername() == null || request.getUsername().isEmpty()) {
-    //         throw new RuntimeException("Username cannot be empty");
-    //     }
-
-    //     if (userRepository.existsByUsername(request.getUsername())) {
-    //         throw new RuntimeException("Username already exists, please choose a different one");
-    //     }
-
-    //     if (userRepository.existsByEmail(request.getEmail())) {
-    //         throw new RuntimeException("Email already registered");
-    //     }
-    // }
 }

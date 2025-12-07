@@ -21,11 +21,13 @@ public class UserController {
 
     @PostMapping("/register")
     public ApiResponse<UserResponse> Register(@RequestBody RegisterRequest request) {
-        UserResponse userResponse = userService.createUser(request);
-        if(userResponse == null) {
-            return ApiResponse.error(1001, "User registration failed");
-        }
+        try {
+            UserResponse userResponse = userService.createUser(request);
+            return ApiResponse.success(userResponse);
 
-        return ApiResponse.success(userResponse);
+        } catch (Exception e) {
+            return ApiResponse.error(1001, e.getMessage());
+        }
+        
     }
 }
