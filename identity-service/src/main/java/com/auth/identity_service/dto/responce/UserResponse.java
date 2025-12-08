@@ -14,5 +14,4 @@ public class UserResponse {
     private String email;
     private LocalDateTime lastLogin;
     private Set<String> roles;
-    private Set<String> permissions;
 }
