@@ -3,6 +3,8 @@ package com.auth.identity_service.services;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.auth.identity_service.dto.request.RegisterRequest;
@@ -20,6 +22,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     public UserResponse createUser(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("This Email is already in use."); 
@@ -32,8 +38,11 @@ public class UserService {
         // 2. Set email
         newUser.setEmail(request.getEmail());
         // 3. Set password (Not Hashed, Add hashing later)
-        newUser.setPassword(request.getPassword());
-        
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
+        String hashedPassword = encoder.encode(request.getPassword());
+        System.out.print(hashedPassword);
+
+        newUser.setPassword(hashedPassword);
         if (request.getRole() != null && !request.getRole().isEmpty()) {
             request.getRole().forEach(roleName -> {
                 Role role = roleRepository.findByName(roleName)
