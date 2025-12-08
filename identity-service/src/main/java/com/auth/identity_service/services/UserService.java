@@ -37,7 +37,7 @@ public class UserService {
         newUser.setUsername(request.getUsername());
         // 2. Set email
         newUser.setEmail(request.getEmail());
-        // 3. Set password (Not Hashed, Add hashing later)
+        // 3. Set password (Hashed).
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
         String hashedPassword = encoder.encode(request.getPassword());
         System.out.print(hashedPassword);
