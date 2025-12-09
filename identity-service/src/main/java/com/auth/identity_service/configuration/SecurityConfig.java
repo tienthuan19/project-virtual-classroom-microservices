@@ -23,10 +23,11 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable) 
             .authorizeHttpRequests(request -> request
-                .requestMatchers("/api/identity-service/v1/users/register").permitAll() 
-                .anyRequest().authenticated() 
+                
+                .requestMatchers("/api/identity-service/v1/auth/**").permitAll() 
+                
+                .anyRequest().authenticated()
             );
-            
         return http.build();
     }
 }
