@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.auth.identity_service.dto.request.RegisterRequest;
 import com.auth.identity_service.dto.responce.UserResponse;
-import com.auth.identity_service.services.UserService;
+import com.auth.identity_service.services.AuthenticationService;
 import com.auth.identity_service.utils.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(value = "/api/identity-service/v1/users")
 
 public class UserController {
-    private final UserService userService;
+    private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
     public ApiResponse<UserResponse> Register(@RequestBody RegisterRequest request) {
         try {
-            UserResponse userResponse = userService.createUser(request);
+            UserResponse userResponse = authenticationService.register(request);
             return ApiResponse.success(userResponse);
 
         } catch (Exception e) {
