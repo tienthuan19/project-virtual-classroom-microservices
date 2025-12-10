@@ -6,7 +6,9 @@ import java.util.Set;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.auth.identity_service.dto.request.AuthRequest;
 import com.auth.identity_service.dto.request.RegisterRequest;
+import com.auth.identity_service.dto.responce.AuthResponse;
 import com.auth.identity_service.dto.responce.UserResponse;
 import com.auth.identity_service.exception.AppException;
 import com.auth.identity_service.exception.ErrorCode;
@@ -42,18 +44,13 @@ public class AuthenticationService {
         User registerUser = new User();
         Set<Role> roles = new HashSet<>();
 
-        if(checkEmptyNull(request.getEmail())){
+        if(checkEmptyNull(request.getEmail()) || checkEmptyNull(request.getPassword()) || checkEmptyNull(request.getUsername())){
             throw new AppException(ErrorCode.MISSING_INPUT);
         }
+
         if (userRepository.existsByEmail(request.getEmail())){
             throw new AppException(ErrorCode.USER_EXISTED);
         }
-        if(checkEmptyNull(request.getPassword())){
-            throw new AppException(ErrorCode.MISSING_INPUT);
-        } 
-        if(checkEmptyNull(request.getUsername())){
-            throw new AppException(ErrorCode.MISSING_INPUT);
-        } 
         if (checkEmptyNull(request.getRole())){
             Role defaultRole = roleRepository.findByName("STUDENT")
                     .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
@@ -68,7 +65,7 @@ public class AuthenticationService {
 
         request.getRole().forEach(roleNames -> {
             Role role = roleRepository.findByName(roleNames)
-                                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
             roles.add(role);
             });
 
@@ -90,5 +87,22 @@ public class AuthenticationService {
                 .email(registerUser.getEmail())
                 .roles(roleNames)
                 .build();
+    }
+
+    public AuthResponse authentication(AuthRequest request){
+        if (checkEmptyNull(request.getEmail()) || checkEmptyNull(request.getPassword())){
+        throw new AppException(ErrorCode.MISSING_INPUT);
+        }
+
+        User user = userRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIALS));
+
+        boolean isMatched = passwordEncoder.matches(request.getPassword(), user.getPassword());
+
+        if (!isMatched) {
+            throw new AppException(ErrorCode.INVALID_CREDENTIALS);
+        }
+        //TO_DO: Generate JWT, Return with AuthResponse
+        return null;
     }
 }
