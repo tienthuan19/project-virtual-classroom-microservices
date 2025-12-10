@@ -1,7 +1,9 @@
 package com.auth.identity_service.controllers;
 
+import com.auth.identity_service.dto.request.AuthRequest;
 import com.auth.identity_service.dto.request.RegisterRequest;
 import com.auth.identity_service.dto.responce.ApiResponse;
+import com.auth.identity_service.dto.responce.AuthResponse;
 import com.auth.identity_service.dto.responce.UserResponse;
 import com.auth.identity_service.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
@@ -25,4 +27,14 @@ public class AuthenticationController {
                 .data(result)
                 .build();
     }
+
+    @PostMapping("/login")
+    public ApiResponse<AuthResponse> authentication(@RequestBody AuthRequest request) {
+        AuthResponse result = authenticationService.authentication(request);
+        
+        return ApiResponse.<AuthResponse>builder()
+                .data(result)
+                .build();
+    }
+    
 }
