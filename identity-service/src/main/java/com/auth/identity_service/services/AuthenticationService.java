@@ -1,7 +1,9 @@
 package com.auth.identity_service.services;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import com.auth.identity_service.models.Role;
 import com.auth.identity_service.models.User;
 import com.auth.identity_service.repository.RoleRepository;
 import com.auth.identity_service.repository.UserRepository;
+import com.auth.identity_service.utils.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +29,7 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     private boolean checkEmptyNull(Object data){
         if (data == null) {
@@ -89,20 +93,48 @@ public class AuthenticationService {
                 .build();
     }
 
-    public AuthResponse authentication(AuthRequest request){
-        if (checkEmptyNull(request.getEmail()) || checkEmptyNull(request.getPassword())){
+    public AuthResponse authentication(AuthRequest authenticationRequest){
+        if (checkEmptyNull(authenticationRequest.getEmail()) || checkEmptyNull(authenticationRequest.getPassword())){
         throw new AppException(ErrorCode.MISSING_INPUT);
         }
 
-        User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIALS));
+        // *** CHECK AGAIN
+        User user = userService.getUserByEmail(authenticationRequest.getEmail());
 
-        boolean isMatched = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        boolean isMatched = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
 
         if (!isMatched) {
             throw new AppException(ErrorCode.INVALID_CREDENTIALS);
         }
-        //TO_DO: Generate JWT, Return with AuthResponse
-        return null;
+        user.setLastLogin(LocalDateTime.now());
+        Set<String> roles = user.getRoles().stream()
+                .map(role -> role.getName()) 
+                .collect(Collectors.toSet());
+
+        String token = jwtUtil.generateToken(
+                String.valueOf(user.getId()), 
+                user.getUsername(),           
+                user.getEmail(),              
+                roles                         
+        );
+
+        Set<String> roleNames = new HashSet<>();
+        if (user.getRoles() != null) {
+        user.getRoles().forEach(role -> roleNames.add(role.getName()));
+        }
+
+        UserResponse userResponse = new UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getLastLogin(),
+                roleNames
+        );
+
+
+        return AuthResponse.builder()
+                .token(token)
+                .user(userResponse)
+                .build();
     }
 }
