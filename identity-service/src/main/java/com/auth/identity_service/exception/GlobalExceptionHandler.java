@@ -11,6 +11,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = RuntimeException.class)
     ResponseEntity<ApiResponse<?>> handlingRuntimeException(RuntimeException exception) {
+        System.err.println("-------------- INTERNAL ERROR --------------");
+        exception.printStackTrace(); 
+        System.err.println("--------------------------------------------");
         ApiResponse<?> apiResponse = new ApiResponse<>(); 
         
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());

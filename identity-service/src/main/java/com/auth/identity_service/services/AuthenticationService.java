@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.auth.identity_service.dto.request.RegisterRequest;
 import com.auth.identity_service.dto.responce.UserResponse;
+import com.auth.identity_service.exception.AppException;
+import com.auth.identity_service.exception.ErrorCode;
 import com.auth.identity_service.models.Role;
 import com.auth.identity_service.models.User;
 import com.auth.identity_service.repository.RoleRepository;
@@ -41,20 +43,20 @@ public class AuthenticationService {
         Set<Role> roles = new HashSet<>();
 
         if(checkEmptyNull(request.getEmail())){
-            throw new RuntimeException("Missing Email");
+            throw new AppException(ErrorCode.MISSING_INPUT);
         }
         if (userRepository.existsByEmail(request.getEmail())){
-            throw new RuntimeException("This Email is already in use");
+            throw new AppException(ErrorCode.USER_EXISTED);
         }
         if(checkEmptyNull(request.getPassword())){
-            throw new RuntimeException("Missing Password");
+            throw new AppException(ErrorCode.MISSING_INPUT);
         } 
         if(checkEmptyNull(request.getUsername())){
-            throw new RuntimeException("Missing Username");
+            throw new AppException(ErrorCode.MISSING_INPUT);
         } 
         if (checkEmptyNull(request.getRole())){
             Role defaultRole = roleRepository.findByName("STUDENT")
-                    .orElseThrow(() -> new RuntimeException("Error: Role STUDENT is not found."));
+                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
             roles.add(defaultRole);
         }
         // 1. Email
@@ -66,7 +68,7 @@ public class AuthenticationService {
 
         request.getRole().forEach(roleNames -> {
             Role role = roleRepository.findByName(roleNames)
-                                    .orElseThrow(() -> new RuntimeException("Role not found: " + roleNames));
+                                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
             roles.add(role);
             });
 
