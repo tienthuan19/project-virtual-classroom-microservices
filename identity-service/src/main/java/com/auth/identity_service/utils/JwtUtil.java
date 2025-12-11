@@ -37,22 +37,54 @@ public class JwtUtil {
             .signWith(getSigningKey(), SignatureAlgorithm.HS512)
             .compact();
     }
+
+    public String generateTempToken(String userId, String userName, String email,String oauth2ProviderName, String oauth2UserId, Set<String> roles) {
+    Date now = new Date();
+    //TO_DO: Set new expiry date for temp token
+    Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
+
+    return Jwts.builder()
+            .claim("userID", userId)
+            .claim("userName", userName) 
+            .claim("email", email)
+            .claim("oauth2ProviderName", oauth2ProviderName)
+            .claim("oauth2UserId", oauth2UserId)
+            .claim("roles", roles)       
+            
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .signWith(getSigningKey(), SignatureAlgorithm.HS512)
+            .compact();
+    }
     
-    // private Claims getAllClaimsFromToken(String token) {
-    //     return Jwts.parserBuilder()
-    //             .setSigningKey(getSigningKey())
-    //             .build()
-    //             .parseClaimsJws(token)
-    //             .getBody();
-    // }
+    private Claims getAllClaimsFromToken(String token) {
+        return Jwts.parserBuilder() 
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
 
-    // public String getEmailFromToken(String token) {
-    //     return getAllClaimsFromToken(token).get("email", String.class);
-    // }
+    public String getEmailFromToken(String token) {
+        // Vì trong generateToken bạn dùng claim("email", email)
+        return getAllClaimsFromToken(token).get("email", String.class);
+    }
 
-    // public List<String> getRolesFromToken(String token) {
-    //     return getAllClaimsFromToken(token).get("roles", List.class);
-    // }
+    public String getUserNameFromToken(String token) {
+        return getAllClaimsFromToken(token).get("userName", String.class);
+    }
+
+    public String getAuthProviderNameFromToken(String token) {
+        return getAllClaimsFromToken(token).get("authProvider", String.class);
+    }
+
+    public String getProviderUserIdFromToken(String token) {
+        return getAllClaimsFromToken(token).get("oauth2ProviderName", String.class);
+    }
+
+    public String getProviderOAuth2UserIdFromToken(String token) {
+        return getAllClaimsFromToken(token).get("oauth2UserId", String.class);
+    }
 
     public boolean validateToken(String authToken) {
         try {
