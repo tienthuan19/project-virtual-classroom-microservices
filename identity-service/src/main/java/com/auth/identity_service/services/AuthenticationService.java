@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.auth.identity_service.dto.request.AuthRequest;
+import com.auth.identity_service.dto.request.Oauth2RegisterRequest;
 import com.auth.identity_service.dto.request.RegisterRequest;
 import com.auth.identity_service.dto.responce.AuthResponse;
 import com.auth.identity_service.dto.responce.UserResponse;
@@ -75,6 +76,10 @@ public class AuthenticationService {
 
         // 4. Roles
         registerUser.setRoles(roles);
+        // 5. Provider (default: LOCAL)
+        registerUser.setOauth2ProviderName("LOCAL");
+        // 6. Provider ID (default: LOCAL)
+        registerUser.setOauth2UserId("LOCAL");    
 
         //SAVE
         userService.createUser(registerUser);
@@ -135,6 +140,59 @@ public class AuthenticationService {
         return AuthResponse.builder()
                 .token(token)
                 .user(userResponse)
+                .build();
+    }
+
+    public AuthResponse registerWithOauth2(Oauth2RegisterRequest request) {
+        // Validate Token
+        if (!jwtUtil.validateToken(request.getTempToken())) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        // Get infor from Token
+        String email = jwtUtil.getEmailFromToken(request.getTempToken()); 
+        String name = jwtUtil.getUserNameFromToken(request.getTempToken());
+        String oauth2ProviderName = jwtUtil.getAuthProviderNameFromToken(request.getTempToken());
+        String oauth2UserId = jwtUtil.getProviderOAuth2UserIdFromToken(request.getTempToken());
+        // Check if email already existed
+        if (userService.existsByEmail(email)) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+
+        User newUser = new User();
+        // 1. Email
+        newUser.setEmail(email);
+        // 2. Username
+        newUser.setUsername(name);
+        // 3. Password (default)
+        newUser.setPassword("OAUTH2_USER_NO_PASSWORD"); 
+        // 4. OAuth2 Provider Name
+        newUser.setOauth2ProviderName(oauth2ProviderName);
+        // 5. OAuth2 User ID
+        newUser.setOauth2UserId(oauth2UserId);
+        
+        Set<Role> roles = new HashSet<>();
+        Role selectedRole = roleRepository.findByName(request.getRole().toUpperCase())
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        roles.add(selectedRole);
+        // 6. Role
+        newUser.setRoles(roles);
+        //SAVE
+        userService.createUser(newUser);
+
+        String finalToken = jwtUtil.generateToken(
+                newUser.getId(),
+                newUser.getUsername(),
+                newUser.getEmail(),
+                Set.of(selectedRole.getName())
+        );
+
+        return AuthResponse.builder()
+                .token(finalToken)
+                .user(UserResponse.builder()
+                        .id(newUser.getId())
+                        .email(newUser.getEmail())
+                        .roles(Set.of(selectedRole.getName()))
+                        .build())
                 .build();
     }
 }
