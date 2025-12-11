@@ -18,13 +18,19 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(name = "oauth2_user_id")
+    private String oauth2UserId; 
+
+    @Column(name = "oauth2_provider_name")
+    private String oauth2ProviderName; 
+
     @Column(nullable = false)
     private String username;
 
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password_hash", nullable = true)
     private String password;
 
     @Column(name = "last_login")
