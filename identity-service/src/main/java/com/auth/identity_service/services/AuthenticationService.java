@@ -55,7 +55,7 @@ public class AuthenticationService {
         if (userRepository.existsByEmail(request.getEmail())){
             throw new AppException(ErrorCode.USER_EXISTED);
         }
-        if (checkEmptyNull(request.getRole())){
+        if (checkEmptyNull(request.getRoles())){
             Role defaultRole = roleRepository.findByName("STUDENT")
                     .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
             roles.add(defaultRole);
@@ -67,7 +67,7 @@ public class AuthenticationService {
         // 3. Username
         registerUser.setUsername(request.getUsername());
 
-        request.getRole().forEach(roleNames -> {
+        request.getRoles().forEach(roleNames -> {
             Role role = roleRepository.findByName(roleNames)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
             roles.add(role);
