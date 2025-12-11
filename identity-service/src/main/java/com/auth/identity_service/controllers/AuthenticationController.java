@@ -1,6 +1,7 @@
 package com.auth.identity_service.controllers;
 
 import com.auth.identity_service.dto.request.AuthRequest;
+import com.auth.identity_service.dto.request.Oauth2RegisterRequest;
 import com.auth.identity_service.dto.request.RegisterRequest;
 import com.auth.identity_service.dto.responce.ApiResponse;
 import com.auth.identity_service.dto.responce.AuthResponse;
@@ -31,6 +32,15 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ApiResponse<AuthResponse> authentication(@RequestBody AuthRequest request) {
         AuthResponse result = authenticationService.authentication(request);
+        
+        return ApiResponse.<AuthResponse>builder()
+                .data(result)
+                .build();
+    }
+
+    @PostMapping("/oauth2-register")
+    public ApiResponse<AuthResponse> socialRegister(@RequestBody Oauth2RegisterRequest request) {
+        AuthResponse result = authenticationService.registerWithOauth2(request);
         
         return ApiResponse.<AuthResponse>builder()
                 .data(result)
