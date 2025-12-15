@@ -24,15 +24,15 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
+        return userRepository.findByEmail(email)
             .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        return user;
     }
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
+    // getName() of the Set<Role> and map to the new Set<String>
     public Set<String> transferUserRolesToSetOfString(User user) {
         return user.getRoles().stream()
             .map(Role::getName)
