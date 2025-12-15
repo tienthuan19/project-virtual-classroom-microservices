@@ -30,7 +30,8 @@ public class JwtUtil {
             .setSubject(userId) 
             .claim("userName", userName) 
             .claim("email", email)       
-            .claim("roles", roles)       
+            .claim("roles", roles)
+            //TODO: expired_date: Now + 24 hours
             
             .setIssuedAt(now)
             .setExpiration(expiryDate)
@@ -40,7 +41,7 @@ public class JwtUtil {
 
     public String generateTempToken(String userId, String userName, String email,String oauth2ProviderName, String oauth2UserId, Set<String> roles) {
     Date now = new Date();
-    //TO_DO: Set new expiry date for temp token
+    //TODO: Set new expiry date for temp token
     Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
 
     return Jwts.builder()
@@ -66,7 +67,7 @@ public class JwtUtil {
     }
 
     public String getEmailFromToken(String token) {
-        // Vì trong generateToken bạn dùng claim("email", email)
+
         return getAllClaimsFromToken(token).get("email", String.class);
     }
 
@@ -74,8 +75,9 @@ public class JwtUtil {
         return getAllClaimsFromToken(token).get("userName", String.class);
     }
 
+    //Change the name to fix get Provider names
     public String getAuthProviderNameFromToken(String token) {
-        return getAllClaimsFromToken(token).get("authProvider", String.class);
+        return getAllClaimsFromToken(token).get("oauth2ProviderName", String.class);
     }
 
     public String getProviderUserIdFromToken(String token) {
