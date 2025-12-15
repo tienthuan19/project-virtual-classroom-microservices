@@ -3,7 +3,6 @@ package com.auth.identity_service.services;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -112,9 +111,7 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.INVALID_CREDENTIALS);
         }
         user.setLastLogin(LocalDateTime.now());
-        Set<String> roles = user.getRoles().stream()
-                .map(role -> role.getName()) 
-                .collect(Collectors.toSet());
+        Set<String> roles = userService.transferUserRolesToSetOfString(user);
 
         String token = jwtUtil.generateToken(
                 String.valueOf(user.getId()), 
