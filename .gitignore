@@ -266,10 +266,8 @@ __marimo__/
 
 .DS_Store
 ._*
-
-.env
 .env.local
 *.env
 
 postgres-data/
-rabbitmq-data/
+.idea/
