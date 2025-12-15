@@ -63,7 +63,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         } else {
             // User is new -> REDIRECT TO ROLE SELECTION PAGE
-            // TO_DO: Write a function to create TEMP TOKEN with limited validity
+            // TODO: Write a function to create TEMP TOKEN with limited validity
             String tempToken = jwtUtil.generateTempToken(
                 "TEMP_ID",
                 name, 
