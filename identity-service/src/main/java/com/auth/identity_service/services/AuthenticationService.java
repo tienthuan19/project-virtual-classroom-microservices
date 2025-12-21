@@ -111,26 +111,17 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.INVALID_CREDENTIALS);
         }
         user.setLastLogin(LocalDateTime.now());
+
+        String token = jwtUtil.generateToken(user);
+
         Set<String> roles = userService.transferUserRolesToSetOfString(user);
-
-        String token = jwtUtil.generateToken(
-                String.valueOf(user.getId()), 
-                user.getUsername(),           
-                user.getEmail(),              
-                roles                         
-        );
-
-        Set<String> roleNames = new HashSet<>();
-        if (user.getRoles() != null) {
-        user.getRoles().forEach(role -> roleNames.add(role.getName()));
-        }
 
         UserResponse userResponse = new UserResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getLastLogin(),
-                roleNames
+                roles
         );
 
 
@@ -176,12 +167,7 @@ public class AuthenticationService {
         //SAVE
         userService.createUser(newUser);
 
-        String finalToken = jwtUtil.generateToken(
-                newUser.getId(),
-                newUser.getUsername(),
-                newUser.getEmail(),
-                Set.of(selectedRole.getName())
-        );
+        String finalToken = jwtUtil.generateToken(newUser);
 
         return AuthResponse.builder()
                 .token(finalToken)

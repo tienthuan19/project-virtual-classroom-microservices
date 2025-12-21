@@ -53,12 +53,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             User user = userOptional.get();
             Set<String> roles = userService.transferUserRolesToSetOfString(user);
 
-            String token = jwtUtil.generateToken(
-                user.getId(), 
-                user.getUsername(), 
-                user.getEmail(), 
-                roles
-            );
+            String token = jwtUtil.generateToken(user);
             response.sendRedirect(frontendUrl + "/oauth2/redirect?token=" + token);
 
         } else {

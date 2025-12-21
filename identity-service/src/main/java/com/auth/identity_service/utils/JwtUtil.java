@@ -1,5 +1,9 @@
 package com.auth.identity_service.utils;
 
+import com.auth.identity_service.models.Permission;
+import com.auth.identity_service.models.Role;
+import com.auth.identity_service.models.User;
+import com.auth.identity_service.services.UserService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
@@ -9,34 +13,43 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
+    private final UserService userService;
     @Value("${app.security.jwtsecret}")
     private String JWT_SECRET;
     
     @Value("${app.security.jwtexpiration}")
     private long JWT_EXPIRATION;
 
+    public JwtUtil(UserService userService) {
+        this.userService = userService;
+    }
+
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
     }
 
-    public String generateToken(String userId, String userName, String email, Set<String> roles) {
+    public String generateToken(User user) {
     Date now = new Date();
     Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
 
-    return Jwts.builder()
-            .setSubject(userId) 
-            .claim("userName", userName) 
-            .claim("email", email)       
-            .claim("roles", roles)
-            //TODO: expired_date: Now + 24 hours
-            
-            .setIssuedAt(now)
-            .setExpiration(expiryDate)
-            .signWith(getSigningKey(), SignatureAlgorithm.HS512)
-            .compact();
+    Set<String> roles = userService.transferUserRolesToSetOfString(user);
+    Set<String> permissions = userService.transferUserPermissionsToSetOfString(user);;
+
+        return Jwts.builder()
+                .setSubject(String.valueOf(user.getId()))
+                .claim("userName", user.getUsername())
+                .claim("email", user.getEmail())
+                .claim("roles", roles)
+                .claim("permissions", permissions)
+
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
+                .compact();
     }
 
     public String generateTempToken(String userId, String userName, String email,String oauth2ProviderName, String oauth2UserId, Set<String> roles) {

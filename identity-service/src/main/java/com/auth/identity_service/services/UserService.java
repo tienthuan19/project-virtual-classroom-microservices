@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.auth.identity_service.models.Permission;
 import org.springframework.stereotype.Service;
 
 import com.auth.identity_service.exception.AppException;
@@ -34,11 +35,23 @@ public class UserService {
 
     // getName() of the Set<Role> and map to the new Set<String>
     public Set<String> transferUserRolesToSetOfString(User user) {
+        if (user.getRoles() == null) {
+            return Set.of();
+        }
         return user.getRoles().stream()
             .map(Role::getName)
             .collect(Collectors.toSet());
     }
 
+    public Set<String> transferUserPermissionsToSetOfString(User user) {
+        if (user.getRoles() == null) {
+            return Set.of();
+        }
+        return user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(Permission::getName)
+                .collect(Collectors.toSet());
+    }
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
