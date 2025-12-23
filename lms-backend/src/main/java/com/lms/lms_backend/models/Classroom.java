@@ -7,13 +7,11 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
-
 @Getter
 @Setter
 @Entity
-@Table(name = "classes")
-public class Class extends BaseEntity {
+@Table(name = "classrooms")
+public class Classroom extends BaseEntity {
     @Id
     @jakarta.validation.constraints.Size(max = 36)
     @Column(name = "id", nullable = false, length = 36)
