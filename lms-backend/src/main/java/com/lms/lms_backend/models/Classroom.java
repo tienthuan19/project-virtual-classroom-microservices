@@ -27,6 +27,10 @@ public class Classroom extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @jakarta.validation.constraints.NotNull
+    @Column(name = "subject", nullable = false)
+    private String subject;
+
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 
