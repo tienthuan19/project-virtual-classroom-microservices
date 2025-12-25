@@ -1,9 +1,6 @@
 package com.lms.lms_backend.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +10,7 @@ import lombok.Setter;
 @Table(name = "classrooms")
 public class Classroom extends BaseEntity {
     @Id
-    @jakarta.validation.constraints.Size(max = 36)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, length = 36)
     private String id;
 
