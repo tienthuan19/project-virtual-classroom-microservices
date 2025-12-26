@@ -17,6 +17,4 @@ public class ClassroomRequest {
     @NotBlank(message = "Class subject is required")
     private String subject;
     private String description;
-    private String creatorId;
-
 }
