@@ -1,0 +1,29 @@
+package com.lms.lms_backend.controllers;
+
+import com.lms.lms_backend.dto.request.ClassroomRequest;
+import com.lms.lms_backend.dto.response.ApiResponse;
+import com.lms.lms_backend.dto.response.ClassroomResponse;
+import com.lms.lms_backend.services.ClassroomService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/lms-backend/v1")
+@RequiredArgsConstructor
+public class ClassroomController {
+    private final ClassroomService classroomService;
+
+    @PostMapping("/classrooms")
+    @PreAuthorize("hasRole('TEACHER') or hasAuthority('crt_cls')")
+    public ApiResponse<ClassroomResponse> createClassroom(ClassroomRequest classroomRequest) {
+        ClassroomResponse response = classroomService.createClassroom(classroomRequest);
+        return ApiResponse.<ClassroomResponse>builder()
+                .status(200)
+                .data(response)
+                .build();
+    }
+
+}
