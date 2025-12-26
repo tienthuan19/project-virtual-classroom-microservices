@@ -7,6 +7,7 @@ import com.lms.lms_backend.services.ClassroomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +19,7 @@ public class ClassroomController {
 
     @PostMapping("/classrooms")
     @PreAuthorize("hasRole('TEACHER') or hasAuthority('crt_cls')")
-    public ApiResponse<ClassroomResponse> createClassroom(ClassroomRequest classroomRequest) {
+    public ApiResponse<ClassroomResponse> createClassroom(@RequestBody ClassroomRequest classroomRequest) {
         ClassroomResponse response = classroomService.createClassroom(classroomRequest);
         return ApiResponse.<ClassroomResponse>builder()
                 .status(200)
