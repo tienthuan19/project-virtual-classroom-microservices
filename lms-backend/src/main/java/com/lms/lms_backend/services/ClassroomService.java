@@ -84,7 +84,7 @@ public class ClassroomService {
         ClassMember newMember = ClassMember.builder()
                 .userId(currentUserId)
                 .classroom(classroom)
-                .isOwner(false)
+                .owner(false)
                 .joinedAt(LocalDateTime.now())
                 .role("STUDENT")
                 .build();
