@@ -1,6 +1,7 @@
 package com.lms.lms_backend.controllers;
 
 import com.lms.lms_backend.dto.request.ClassroomRequest;
+import com.lms.lms_backend.dto.request.JoinClassRequest;
 import com.lms.lms_backend.dto.response.ApiResponse;
 import com.lms.lms_backend.dto.response.ClassroomCardResponse;
 import com.lms.lms_backend.dto.response.ClassroomResponse;
@@ -46,6 +47,19 @@ public class ClassroomController {
                 .status(200)
                 .message("Get dashboard stats successfully")
                 .data(response)
+                .build();
+    }
+
+    @PostMapping("/classrooms/join")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ApiResponse<String> joinClass(@RequestBody JoinClassRequest request) {
+
+        String classroomId = classroomService.joinClassroom(request);
+
+        return ApiResponse.<String>builder()
+                .status(200)
+                .message("Joined class successfully")
+                .data(classroomId)
                 .build();
     }
 
