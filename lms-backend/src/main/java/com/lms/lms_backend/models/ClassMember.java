@@ -26,6 +26,11 @@ public class ClassMember extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
+    @Column(name = "is_owner", nullable = false)
+    private boolean isOwner = false;
+
+    @Column(name = "role")
+    private String role;
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;
 }
