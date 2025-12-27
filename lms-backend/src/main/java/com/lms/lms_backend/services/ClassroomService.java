@@ -1,18 +1,23 @@
 package com.lms.lms_backend.services;
 
 import com.lms.lms_backend.dto.request.ClassroomRequest;
+import com.lms.lms_backend.dto.response.ClassroomCardResponse;
 import com.lms.lms_backend.dto.response.ClassroomResponse;
+import com.lms.lms_backend.dto.response.TeacherDashboardResponse;
 import com.lms.lms_backend.models.Classroom;
+import com.lms.lms_backend.repository.ClassMemberRepository;
 import com.lms.lms_backend.repository.ClassroomRepository;
-import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ClassroomService {
     private final ClassroomRepository classroomRepository;
+    private final ClassMemberRepository classMemberRepository;
 
     public ClassroomResponse createClassroom(ClassroomRequest request) {
 
@@ -41,6 +46,22 @@ public class ClassroomService {
                 .description(savedClass.getDescription())
                 .creatorId(savedClass.getCreatorId())
                 .createdAt(savedClass.getCreatedAt())
+                .build();
+    }
+    public List<ClassroomCardResponse> getTeacherClassrooms() {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return classroomRepository.findClassroomsWithStatsByTeacherId(currentUserId);
+    }
+
+    public TeacherDashboardResponse getTeacherDashboardStats() {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        long totalClassrooms = classroomRepository.countByCreatorId(currentUserId);
+        long totalStudents = classMemberRepository.countTotalStudentsByTeacher(currentUserId);
+
+        return TeacherDashboardResponse.builder()
+                .totalClassrooms(totalClassrooms)
+                .totalStudents(totalStudents)
                 .build();
     }
 }
