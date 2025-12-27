@@ -1,9 +1,11 @@
 package com.lms.lms_backend.services;
 
 import com.lms.lms_backend.dto.request.ClassroomRequest;
+import com.lms.lms_backend.dto.request.JoinClassRequest;
 import com.lms.lms_backend.dto.response.ClassroomCardResponse;
 import com.lms.lms_backend.dto.response.ClassroomResponse;
 import com.lms.lms_backend.dto.response.TeacherDashboardResponse;
+import com.lms.lms_backend.models.ClassMember;
 import com.lms.lms_backend.models.Classroom;
 import com.lms.lms_backend.repository.ClassMemberRepository;
 import com.lms.lms_backend.repository.ClassroomRepository;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -63,5 +66,31 @@ public class ClassroomService {
                 .totalClassrooms(totalClassrooms)
                 .totalStudents(totalStudents)
                 .build();
+    }
+    public String joinClassroom(JoinClassRequest request) {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Classroom classroom = classroomRepository.findByClassCode(request.getClassCode())
+                .orElseThrow(() -> new RuntimeException("Class code not found or invalid"));
+
+        if (classMemberRepository.existsByUserIdAndClassroom(currentUserId, classroom)) {
+            throw new RuntimeException("You are already a member of this class");
+        }
+
+        if (classroom.getCreatorId().equals(currentUserId)) {
+            throw new RuntimeException("You are the creator of this class");
+        }
+
+        ClassMember newMember = ClassMember.builder()
+                .userId(currentUserId)
+                .classroom(classroom)
+                .isOwner(false)
+                .joinedAt(LocalDateTime.now())
+                .role("STUDENT")
+                .build();
+
+        classMemberRepository.save(newMember);
+
+        return classroom.getId();
     }
 }
