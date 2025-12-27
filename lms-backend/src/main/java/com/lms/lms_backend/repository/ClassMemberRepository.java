@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ClassMemberRepository extends JpaRepository<ClassMember, Long> {
+    boolean existsByUserIdAndClassroom(String userId, Classroom classroom);
     @Query("SELECT COUNT(cm) FROM ClassMember cm " +
             "JOIN cm.classroom c " +
             "WHERE c.creatorId = :creatorId")
