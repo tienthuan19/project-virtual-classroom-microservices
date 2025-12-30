@@ -93,4 +93,9 @@ public class ClassroomService {
 
         return classroom.getId();
     }
+    public List<ClassroomCardResponse> getStudentClassrooms() {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return classroomRepository.findClassroomsByStudentId(currentUserId);
+    }
 }
