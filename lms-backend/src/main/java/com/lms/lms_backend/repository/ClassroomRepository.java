@@ -30,4 +30,19 @@ public interface ClassroomRepository extends JpaRepository<Classroom, String> {
             "WHERE c.creatorId = :creatorId " +
             "ORDER BY c.createdAt DESC")
     List<ClassroomCardResponse> findClassroomsWithStatsByTeacherId(@Param("creatorId") String creatorId);
+
+    @Query("SELECT new com.lms.lms_backend.dto.response.ClassroomCardResponse(" +
+            "c.id, " +
+            "c.name, " +
+            "c.classCode, " +
+            "c.subject, " +
+            "c.description, " +
+            "c.createdAt, " +
+            "(SELECT COUNT(m) FROM ClassMember m WHERE m.classroom = c), " +
+            "0L) " +
+            "FROM Classroom c " +
+            "JOIN ClassMember cm ON c.id = cm.classroom.id " +
+            "WHERE cm.userId = :studentId " +
+            "ORDER BY cm.joinedAt DESC")
+    List<ClassroomCardResponse> findClassroomsByStudentId(@Param("studentId") String studentId);
 }
