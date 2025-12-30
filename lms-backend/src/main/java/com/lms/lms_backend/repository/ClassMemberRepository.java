@@ -7,9 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ClassMemberRepository extends JpaRepository<ClassMember, Long> {
     boolean existsByUserIdAndClassroom(String userId, Classroom classroom);
+    List<ClassMember> findByClassroomId(String classroomId);
     @Query("SELECT COUNT(cm) FROM ClassMember cm " +
             "JOIN cm.classroom c " +
             "WHERE c.creatorId = :creatorId")
