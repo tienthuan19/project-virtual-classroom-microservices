@@ -63,4 +63,16 @@ public class ClassroomController {
                 .build();
     }
 
+    @GetMapping("/classrooms/student/my-classes")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ApiResponse<List<ClassroomCardResponse>> getStudentClassrooms() {
+        List<ClassroomCardResponse> response = classroomService.getStudentClassrooms();
+
+        return ApiResponse.<List<ClassroomCardResponse>>builder()
+                .status(200)
+                .message("Get joined classrooms successfully")
+                .data(response)
+                .build();
+    }
+
 }
