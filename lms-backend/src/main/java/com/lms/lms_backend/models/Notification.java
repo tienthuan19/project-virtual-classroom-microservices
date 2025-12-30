@@ -11,19 +11,14 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Notification extends BaseEntity {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+    private String recipientId;
+    private String message;
+    private boolean isRead;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_code", referencedColumnName = "class_code")
-    private Classroom classroom;
-
-    @Column(name = "sender_id")
-    private String senderId; // ID của người gửi (User ID)
-
-    private String title;
-
-    @Column(columnDefinition = "TEXT")
-    private String content;
+    private String relatedEntityId;
+    private String type;
 }
