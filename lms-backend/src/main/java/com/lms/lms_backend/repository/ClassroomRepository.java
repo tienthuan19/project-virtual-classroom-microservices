@@ -25,7 +25,7 @@ public interface ClassroomRepository extends JpaRepository<Classroom, String> {
             "c.description, " +
             "c.createdAt, " +
             "(SELECT COUNT(m) FROM ClassMember m WHERE m.classroom = c), " +
-            "0L) " +
+            "(SELECT COUNT(a) FROM Assignment a WHERE a.classroom = c)) " +
             "FROM Classroom c " +
             "WHERE c.creatorId = :creatorId " +
             "ORDER BY c.createdAt DESC")
@@ -39,7 +39,7 @@ public interface ClassroomRepository extends JpaRepository<Classroom, String> {
             "c.description, " +
             "c.createdAt, " +
             "(SELECT COUNT(m) FROM ClassMember m WHERE m.classroom = c), " +
-            "0L) " +
+            "(SELECT COUNT(a) FROM Assignment a WHERE a.classroom = c)) " +
             "FROM Classroom c " +
             "JOIN ClassMember cm ON c.id = cm.classroom.id " +
             "WHERE cm.userId = :studentId " +
