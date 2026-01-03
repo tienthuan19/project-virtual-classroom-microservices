@@ -26,6 +26,9 @@ public class Submission extends BaseEntity {
     @Column(name = "total_score")
     private Double totalScore;
 
+    @Column(columnDefinition = "TEXT")
+    private String feedback;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignment_id")
     private Assignment assignment;
