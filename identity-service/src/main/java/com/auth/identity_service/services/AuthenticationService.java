@@ -110,6 +110,7 @@ public class AuthenticationService {
         if (!isMatched) {
             throw new AppException(ErrorCode.INVALID_CREDENTIALS);
         }
+        //TODO: update time login
         user.setLastLogin(LocalDateTime.now());
 
         String token = jwtUtil.generateToken(user);
