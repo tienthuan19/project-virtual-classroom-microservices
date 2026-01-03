@@ -1,5 +1,7 @@
 package com.lms.lms_backend.services;
 
+import com.lms.lms_backend.dto.rabbitmq.EssayAnswerDto;
+import com.lms.lms_backend.dto.rabbitmq.SubmissionMessageDto;
 import com.lms.lms_backend.dto.request.SubmissionRequest;
 import com.lms.lms_backend.models.Assignment;
 import com.lms.lms_backend.models.Question;
@@ -9,6 +11,8 @@ import com.lms.lms_backend.repository.AssignmentRepository;
 import com.lms.lms_backend.repository.SubmissionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +25,10 @@ import java.util.stream.Collectors;
 public class SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final AssignmentRepository assignmentRepository;
+    private final RabbitTemplate rabbitTemplate;
+
+    @Value("${rabbitmq.queue.submission}")
+    private String submissionQueue;
 
     @Transactional
     public String submitAssignment(String assignmentId, SubmissionRequest request) {
@@ -70,7 +78,32 @@ public class SubmissionService {
         submissionRepository.save(submission);
 
         // TODO: Send to AI service (Async)
+        try {
+            List<EssayAnswerDto> essayAnswers = submission.getSubmissionDetails().stream()
+                    .map(detail -> EssayAnswerDto.builder()
+                            .question_id(detail.getQuestion().getId())
+                            .question_text(detail.getQuestion().getContent())
+                            .model_answer(detail.getQuestion().getModelAnswer())
+                            .student_answer(detail.getStudentAnswer())
+                            .weight(detail.getQuestion().getScore() != null ? detail.getQuestion().getScore() : 100)
+                            .build())
+                    .collect(Collectors.toList());
 
+            SubmissionMessageDto message = SubmissionMessageDto.builder()
+                    .submission_id(submission.getId())
+                    .assignment_id(assignment.getId())
+                    .student_id(submission.getStudentId())
+                    .submitted_at(submission.getSubmittedAt().toString())
+                    .essay_answers(essayAnswers)
+                    .build();
+
+            rabbitTemplate.convertAndSend(submissionQueue, message);
+            System.out.println(">>> Sent submission to AI Service: " + submission.getId());
+
+        } catch (Exception e) {
+            System.err.println(">>> Failed to send to RabbitMQ: " + e.getMessage());
+            // Có thể throw exception để rollback transaction nếu yêu cầu bắt buộc phải gửi được
+        }
         return "Submission received successfully";
     }
 }
