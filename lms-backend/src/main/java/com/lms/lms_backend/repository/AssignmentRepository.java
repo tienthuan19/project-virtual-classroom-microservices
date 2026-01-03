@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment, String> {
     List<Assignment> findByClassroomIdOrderByCreatedAtDesc(String classroomId);
+    long countByClassroomId(String classroomId);
 }
