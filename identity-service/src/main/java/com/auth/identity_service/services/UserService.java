@@ -1,9 +1,11 @@
 package com.auth.identity_service.services;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.auth.identity_service.dto.responce.UserResponse;
 import com.auth.identity_service.models.Permission;
 import org.springframework.stereotype.Service;
 
@@ -54,5 +56,15 @@ public class UserService {
     }
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public List<UserResponse> getUsersByIds(List<String> userIds) {
+        return userRepository.findAllById(userIds).stream()
+                .map(user -> UserResponse.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .username(user.getUsername())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
