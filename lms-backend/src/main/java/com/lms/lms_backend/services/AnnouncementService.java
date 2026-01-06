@@ -11,13 +11,16 @@ import com.lms.lms_backend.repository.AnnouncementRepository;
 import com.lms.lms_backend.repository.ClassMemberRepository;
 import com.lms.lms_backend.repository.ClassroomRepository;
 import com.lms.lms_backend.repository.NotificationRepository;
+import com.lms.lms_backend.repository.httpclient.IdentityClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +32,7 @@ public class AnnouncementService {
     private final ClassMemberRepository classMemberRepository;
     private final NotificationRepository notificationRepository;
     private final EmailService emailService;
+    private final IdentityClient identityClient;
 
     @Transactional
     public AnnouncementResponse createAnnouncement(String classroomId, AnnouncementRequest request) {
@@ -52,6 +56,34 @@ public class AnnouncementService {
         Announcement savedAnnouncement = announcementRepository.save(announcement);
 
         List<ClassMember> members = classMemberRepository.findByClassroomId(classroomId);
+        // 1
+        Map<String, String> emailMap = new HashMap<>();
+
+        // 2
+        if (request.isSendEmail()) {
+
+            List<String> studentIds = members.stream()
+                    .map(ClassMember::getUserId)
+                    .filter(id -> !id.equals(currentUserId))
+                    .collect(Collectors.toList());
+
+            if (!studentIds.isEmpty()) {
+                try {
+
+                    var response = identityClient.getUsersByIds(studentIds);
+                    if (response.getData() != null) {
+
+                        emailMap = response.getData().stream()
+                                .collect(Collectors.toMap(
+                                        IdentityClient.UserResponse::getId,
+                                        IdentityClient.UserResponse::getEmail
+                                ));
+                    }
+                } catch (Exception e) {
+                    System.err.println("Lỗi gọi Identity Service: " + e.getMessage());
+                }
+            }
+        }
         List<Notification> notifications = new ArrayList<>();
 
         for (ClassMember member : members) {
@@ -67,15 +99,16 @@ public class AnnouncementService {
             notifications.add(noti);
 
             if (request.isSendEmail()) {
-                // TODO: Bạn cần lấy email thật của user từ Identity Service.
-                String studentEmail = member.getUserId() + "@student.school.com";
 
-                String subject = "[LỚP " + classroom.getName() + "] " + request.getTitle();
-                String body = "Giáo viên vừa đăng thông báo:\n" + request.getContent() +
-                        "\nĐộ ưu tiên: " + savedAnnouncement.getPriority();
+                String studentEmail = emailMap.get(member.getUserId()); // Lấy email từ Map
 
-                emailService.sendAnnouncementEmail(studentEmail, subject, body);
+                if (studentEmail != null && !studentEmail.isEmpty()) {
+                    String subject = "[LỚP " + classroom.getName() + "] " + request.getTitle();
+                    String body = "Nội dung: " + request.getContent();
+                    emailService.sendAnnouncementEmail(studentEmail, subject, body);
+                }
             }
+
         }
 
         notificationRepository.saveAll(notifications);

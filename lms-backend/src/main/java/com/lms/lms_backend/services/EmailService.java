@@ -12,7 +12,7 @@ public class EmailService {
     // private final JavaMailSender javaMailSender;
     @Async
     public void sendAnnouncementEmail(String toEmail, String subject, String content) {
-
+        //TODO: Add sending email service
         System.out.println(">>> EMAIL SENT TO: " + toEmail);
         System.out.println("Subject: " + subject);
     }
