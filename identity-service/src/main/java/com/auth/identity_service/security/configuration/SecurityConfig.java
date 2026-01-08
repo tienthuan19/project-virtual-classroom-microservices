@@ -32,8 +32,9 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable) 
             .authorizeHttpRequests(request -> request
-                
-                .requestMatchers("/api/identity-service/v1/auth/**").permitAll() 
+
+                .requestMatchers("/api/identity-service/v1/auth/**").permitAll()
+                    .requestMatchers("/api/identity-service/v1/users/**").permitAll()
                 
                 .anyRequest().authenticated()
             )
