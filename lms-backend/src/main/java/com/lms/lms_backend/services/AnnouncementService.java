@@ -80,7 +80,7 @@ public class AnnouncementService {
                                 ));
                     }
                 } catch (Exception e) {
-                    System.err.println("Lỗi gọi Identity Service: " + e.getMessage());
+                    System.err.println("Cant call Identity Service: " + e.getMessage());
                 }
             }
         }
@@ -91,7 +91,7 @@ public class AnnouncementService {
 
             Notification noti = Notification.builder()
                     .recipientId(member.getUserId())
-                    .message("Thông báo mới: " + request.getTitle())
+                    .message("NEW: " + request.getTitle())
                     .isRead(false)
                     .relatedEntityId(savedAnnouncement.getId())
                     .type("ANNOUNCEMENT")
@@ -99,12 +99,12 @@ public class AnnouncementService {
             notifications.add(noti);
 
             if (request.isSendEmail()) {
-
-                String studentEmail = emailMap.get(member.getUserId()); // Lấy email từ Map
-
+                String studentEmail = emailMap.get(member.getUserId());
                 if (studentEmail != null && !studentEmail.isEmpty()) {
-                    String subject = "[LỚP " + classroom.getName() + "] " + request.getTitle();
-                    String body = "Nội dung: " + request.getContent();
+                    String subject = "[Announcement] " + classroom.getName() + ": " + request.getTitle();
+
+                    String body = request.getContent();
+
                     emailService.sendAnnouncementEmail(studentEmail, subject, body);
                 }
             }
