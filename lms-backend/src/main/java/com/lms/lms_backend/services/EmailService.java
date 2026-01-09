@@ -41,23 +41,41 @@ public class EmailService {
         }
     }
 
+    // Hàm tạo giao diện HTML cho email (Template GradingAI)
     private String buildHtmlEmail(String title, String content) {
         return """
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-                <h2 style="color: #0056b3; text-align: center;">Hệ Thống Lớp Học Ảo</h2>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-            
-                <h3 style="color: #333;">%s</h3>
-            
-                <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; color: #555; line-height: 1.6;">
-                    %s
+            <div style="background-color: #f0f9ff; font-family: 'Segoe UI', Arial, sans-serif; padding: 40px 20px; margin: 0;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;">
+  
+                    <div style="height: 6px; background: linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6); width: 100%%;"></div>
+
+                    <div style="padding: 40px 32px;">
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">
+                                Grading<span style="color: #0ea5e9;">AI</span>
+                            </h1>
+                            <p style="margin: 5px 0 0 0; color: #64748b; font-size: 14px;">Hệ thống lớp học thông minh</p>
+                        </div>
+
+                        <h2 style="color: #1e293b; font-size: 20px; font-weight: 700; margin: 0 0 20px 0; line-height: 1.4;">
+                            %s
+                        </h2>
+
+                        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; color: #334155; font-size: 16px; line-height: 1.6;">
+                            %s
+                        </div>
+
+                        <div style="margin-top: 30px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                            <p style="color: #94a3b8; font-size: 13px; margin: 0; line-height: 1.5;">
+                                Bạn nhận được email này vì bạn là thành viên của GradingAI.<br>
+                                Đây là email tự động, vui lòng không trả lời.
+                            </p>
+                            <p style="color: #cbd5e1; font-size: 12px; margin-top: 10px;">
+                                &copy; 2026 GradingAI. All rights reserved.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-                <p style="text-align: center; color: #888; font-size: 12px;">
-                    Đây là email tự động, vui lòng không trả lời.<br>
-                    &copy; 2026 Virtual Classroom Project.
-                </p>
             </div>
             """.formatted(title, content.replace("\n", "<br>"));
     }
