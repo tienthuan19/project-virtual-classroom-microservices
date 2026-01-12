@@ -22,4 +22,16 @@ public interface AssignmentRepository extends JpaRepository<Assignment, String> 
             @Param("classId") String classId,
             @Param("studentId") String studentId
     );
+
+    @Query("SELECT COUNT(a) FROM Assignment a " +
+            "JOIN a.classroom c " +
+            "WHERE c.creatorId = :teacherId")
+    long countAssignmentsByTeacherId(String teacherId);
+
+    @Query("SELECT COUNT(m) FROM Assignment a " +
+            "JOIN a.classroom c " +             // Join bài tập với lớp học
+            "JOIN ClassMember m ON m.classroom = c " + // Join lớp học với thành viên
+            "WHERE c.creatorId = :teacherId " +
+            "AND m.role = 'STUDENT'")           // Chỉ đếm học sinh, không đếm giáo viên/trợ giảng
+    long countTotalExpectedSubmissionsByTeacherId(String teacherId);
 }

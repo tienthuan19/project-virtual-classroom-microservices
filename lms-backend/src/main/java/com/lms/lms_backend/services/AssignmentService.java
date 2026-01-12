@@ -107,6 +107,7 @@ public class AssignmentService {
                 .duration(a.getDuration())
                 .maxScore(a.getMaxScore())
                 .createdAt(a.getCreatedAt())
+                .numberOfQuestions(a.getQuestions() != null ? a.getQuestions().size() : 0)
                 .build();
     }
     public AssignmentDetailResponse getAssignmentDetail(String assignmentId) {
@@ -150,6 +151,7 @@ public class AssignmentService {
                 .dueDate(assignment.getDueDate())
                 .duration(assignment.getDuration())
                 .maxScore(assignment.getMaxScore())
+                .numberOfQuestions(assignment.getQuestions() != null ? assignment.getQuestions().size() : 0)
                 .build();
     }
 }
