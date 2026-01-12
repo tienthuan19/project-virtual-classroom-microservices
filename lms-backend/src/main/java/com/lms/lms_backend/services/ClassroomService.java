@@ -2,21 +2,24 @@ package com.lms.lms_backend.services;
 
 import com.lms.lms_backend.dto.request.ClassroomRequest;
 import com.lms.lms_backend.dto.request.JoinClassRequest;
-import com.lms.lms_backend.dto.response.ClassroomCardResponse;
-import com.lms.lms_backend.dto.response.ClassroomResponse;
-import com.lms.lms_backend.dto.response.TeacherDashboardResponse;
+import com.lms.lms_backend.dto.response.*;
 import com.lms.lms_backend.models.ClassMember;
 import com.lms.lms_backend.models.Classroom;
 import com.lms.lms_backend.repository.AssignmentRepository;
 import com.lms.lms_backend.repository.ClassMemberRepository;
 import com.lms.lms_backend.repository.ClassroomRepository;
 import com.lms.lms_backend.repository.SubmissionRepository;
+import com.lms.lms_backend.repository.httpclient.IdentityClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,8 @@ public class ClassroomService {
     private final ClassMemberRepository classMemberRepository;
     private final AssignmentRepository assignmentRepository;
     private final SubmissionRepository submissionRepository;
+
+    private final IdentityClient identityClient;
 
     public ClassroomResponse createClassroom(ClassroomRequest request) {
 
@@ -118,4 +123,39 @@ public class ClassroomService {
 
         return classroomRepository.findClassroomsByStudentId(currentUserId);
     }
+
+    public List<ClassMemberResponse> getClassMembers(String classroomId) {
+        // 1
+        List<ClassMember> members = classMemberRepository.findByClassroomId(classroomId);
+
+        if (members.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 2
+        List<String> userIds = members.stream()
+                .map(ClassMember::getUserId)
+                .collect(Collectors.toList());
+
+        // 3
+        ApiResponse<List<IdentityClient.UserResponse>> identityResponse = identityClient.getUsersByIds(userIds);
+        List<IdentityClient.UserResponse> userInfos = identityResponse.getData();
+
+        // 4
+        Map<String, IdentityClient.UserResponse> userMap = userInfos.stream()
+                .collect(Collectors.toMap(IdentityClient.UserResponse::getId, Function.identity()));
+
+        // 5
+        return members.stream().map(member -> {
+            IdentityClient.UserResponse userInfo = userMap.get(member.getUserId());
+            return ClassMemberResponse.builder()
+                    .id(member.getUserId())
+                    .name(userInfo != null ? userInfo.getUsername() : "Unknown User")
+                    .email(userInfo != null ? userInfo.getEmail() : "")
+                    .role(member.getRole())
+                    .joinedAt(member.getJoinedAt())
+                    .build();
+        }).collect(Collectors.toList());
+    }
 }
+

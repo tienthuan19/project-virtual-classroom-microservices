@@ -2,13 +2,12 @@ package com.lms.lms_backend.controllers;
 
 import com.lms.lms_backend.dto.request.ClassroomRequest;
 import com.lms.lms_backend.dto.request.JoinClassRequest;
-import com.lms.lms_backend.dto.response.ApiResponse;
-import com.lms.lms_backend.dto.response.ClassroomCardResponse;
-import com.lms.lms_backend.dto.response.ClassroomResponse;
-import com.lms.lms_backend.dto.response.TeacherDashboardResponse;
+import com.lms.lms_backend.dto.response.*;
 import com.lms.lms_backend.services.ClassroomService;
+import com.lms.lms_backend.services.SubmissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClassroomController {
     private final ClassroomService classroomService;
+    private final SubmissionService submissionService;
 
     @PostMapping("/classrooms")
     @PreAuthorize("hasRole('TEACHER') or hasAuthority('crt_cls')")
@@ -75,4 +75,27 @@ public class ClassroomController {
                 .build();
     }
 
+    @GetMapping("/classrooms/{classroomId}/members")
+    @PreAuthorize("hasAnyRole('TEACHER', 'STUDENT')")
+    public ApiResponse<List<ClassMemberResponse>> getClassMembers(@PathVariable String classroomId) {
+        return ApiResponse.<List<ClassMemberResponse>>builder()
+                .status(200)
+                .message("Get class members successfully")
+                .data(classroomService.getClassMembers(classroomId))
+                .build();
+    }
+
+    @GetMapping("student/grades/{classroomId}")
+    public ApiResponse<List<StudentGradeResponse>> getMyGrades(
+            @PathVariable String classroomId
+    ) {
+        // Lấy userId từ Security Context do Filter đã set
+        String studentId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return ApiResponse.<List<StudentGradeResponse>>builder()
+                .status(200)
+                .message("Get grades successfully")
+                .data(submissionService.getStudentGrades(classroomId, studentId))
+                .build();
+    }
 }
