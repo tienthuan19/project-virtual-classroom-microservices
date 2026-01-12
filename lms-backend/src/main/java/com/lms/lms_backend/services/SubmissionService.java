@@ -3,6 +3,7 @@ package com.lms.lms_backend.services;
 import com.lms.lms_backend.dto.rabbitmqDto.EssayAnswerDto;
 import com.lms.lms_backend.dto.rabbitmqDto.SubmissionMessageDto;
 import com.lms.lms_backend.dto.request.SubmissionRequest;
+import com.lms.lms_backend.dto.response.StudentGradeResponse;
 import com.lms.lms_backend.models.Assignment;
 import com.lms.lms_backend.models.Question;
 import com.lms.lms_backend.models.Submission;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,5 +106,46 @@ public class SubmissionService {
             System.err.println(">>> Failed to send to RabbitMQ: " + e.getMessage());
         }
         return "Submission received successfully";
+    }
+    public List<StudentGradeResponse> getStudentGrades(String classroomId, String studentId) {
+        // 1. Lấy tất cả bài tập trong lớp (Sử dụng hàm vừa thêm bên Repository)
+        List<Assignment> assignments = assignmentRepository.findByClassroomId(classroomId);
+
+        // 2. Duyệt qua từng bài tập để tìm submission tương ứng
+        return assignments.stream().map(assignment -> {
+            // Tìm bài nộp của học sinh cho bài tập này
+            Optional<Submission> submissionOpt = submissionRepository.findByAssignmentIdAndStudentId(assignment.getId(), studentId);
+
+            // Xử lý maxScore: Chuyển Integer sang Double để khớp với DTO
+            Double maxScoreVal = assignment.getMaxScore() != null ? assignment.getMaxScore().doubleValue() : 0.0;
+
+            if (submissionOpt.isPresent()) {
+                Submission submission = submissionOpt.get();
+                return StudentGradeResponse.builder()
+                        .assignmentId(assignment.getId())
+                        .assignmentTitle(assignment.getTitle())
+                        .maxScore(maxScoreVal) // <--- Đã sửa lỗi tại đây
+                        .submissionId(submission.getId())
+                        .score(submission.getTotalScore())
+                        .feedback(submission.getFeedback())
+                        .submittedAt(submission.getSubmittedAt())
+                        .status(submission.getTotalScore() != null ? "Đã chấm" : "Đã nộp")
+                        .build();
+            } else {
+                // Chưa nộp bài
+                boolean isOverdue = assignment.getDueDate() != null && assignment.getDueDate().isBefore(LocalDateTime.now());
+
+                return StudentGradeResponse.builder()
+                        .assignmentId(assignment.getId())
+                        .assignmentTitle(assignment.getTitle())
+                        .maxScore(maxScoreVal) // <--- Đã sửa lỗi tại đây
+                        .submissionId(null)
+                        .score(null)
+                        .feedback(null)
+                        .submittedAt(null)
+                        .status(isOverdue ? "Quá hạn" : "Chưa nộp")
+                        .build();
+            }
+        }).collect(Collectors.toList());
     }
 }
