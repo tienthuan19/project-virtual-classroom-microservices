@@ -1,7 +1,7 @@
 package com.lms.lms_backend.services;
 
-import com.lms.lms_backend.dto.rabbitmq.GradingResultDto;
-import com.lms.lms_backend.dto.rabbitmq.GradingDetailDto;
+import com.lms.lms_backend.dto.rabbitmqDto.GradingResultDto;
+import com.lms.lms_backend.dto.rabbitmqDto.GradingDetailDto;
 import com.lms.lms_backend.models.Submission;
 import com.lms.lms_backend.models.SubmissionDetail;
 import com.lms.lms_backend.repository.SubmissionRepository;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 // 👇 THÊM IMPORT NÀY ĐỂ FIX LỖI cannot find symbol class UUID
-import java.util.UUID;
 import java.util.Map;
 import java.util.stream.Collectors;
 
