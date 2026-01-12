@@ -47,6 +47,13 @@ public class AssignmentController {
                 .data(result)
                 .build();
     }
+    @GetMapping("/{classroomId}/assignments/pending")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ApiResponse<List<AssignmentResponse>> getPendingAssignments(@PathVariable String classroomId) {
+        return ApiResponse.<List<AssignmentResponse>>builder()
+                .data(assignmentService.getPendingAssignmentsForStudent(classroomId))
+                .build();
+    }
     // 3
     @GetMapping("/assignments/{assignmentId}")
     @PreAuthorize("hasAnyRole('TEACHER', 'STUDENT')")

@@ -41,24 +41,24 @@ public class AssignmentService {
         // ==================================================================
         // VALIDATION
         // ==================================================================
-        if (request.getQuestions() != null && !request.getQuestions().isEmpty()) {
-
-            int totalQuestionScore = request.getQuestions().stream()
-                    .mapToInt(QuestionRequest::getScore)
-                    .sum();
-
-
-            if (totalQuestionScore != request.getMaxScore()) {
-                throw new RuntimeException(
-                        String.format("Sum score of all question (%d) must equal the max score of the assignment (%d)",
-                                totalQuestionScore, request.getMaxScore())
-                );
-            }
-        } else {
-            if (request.getMaxScore() > 0) {
-                throw new RuntimeException("Max score > 0, at least 1 question");
-            }
-        }
+//        if (request.getQuestions() != null && !request.getQuestions().isEmpty()) {
+//
+//            int totalQuestionScore = request.getQuestions().stream()
+//                    .mapToInt(QuestionRequest::getScore)
+//                    .sum();
+//
+//
+//            if (totalQuestionScore != request.getMaxScore()) {
+//                throw new RuntimeException(
+//                        String.format("Sum score of all question (%d) must equal the max score of the assignment (%d)",
+//                                totalQuestionScore, request.getMaxScore())
+//                );
+//            }
+//        } else {
+//            if (request.getMaxScore() > 0) {
+//                throw new RuntimeException("Max score > 0, at least 1 question");
+//            }
+//        }
         // ==================================================================
 
         // 4
@@ -129,6 +129,27 @@ public class AssignmentService {
                 .duration(assignment.getDuration())
                 .maxScore(assignment.getMaxScore())
                 .questions(questionResponses)
+                .build();
+    }
+
+    public List<AssignmentResponse> getPendingAssignmentsForStudent(String classId) {
+        String studentId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        List<Assignment> assignments = assignmentRepository.findPendingAssignmentsByClassIdAndStudentId(classId, studentId);
+
+        return assignments.stream()
+                .map(this::toAssignmentResponse)
+                .toList();
+    }
+
+    private AssignmentResponse toAssignmentResponse(Assignment assignment) {
+        return AssignmentResponse.builder()
+                .id(assignment.getId())
+                .title(assignment.getTitle())
+                .description(assignment.getDescription())
+                .dueDate(assignment.getDueDate())
+                .duration(assignment.getDuration())
+                .maxScore(assignment.getMaxScore())
                 .build();
     }
 }
