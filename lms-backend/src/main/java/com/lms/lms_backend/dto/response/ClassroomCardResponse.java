@@ -19,4 +19,5 @@ public class ClassroomCardResponse {
     private LocalDateTime createdAt;
     private long numberOfStudents;
     private long numberOfAssignments;
+    private long numberOfPendingAssignments;
 }
