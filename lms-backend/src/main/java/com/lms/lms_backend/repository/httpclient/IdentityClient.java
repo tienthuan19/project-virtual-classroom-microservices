@@ -16,8 +16,6 @@ public interface IdentityClient {
     @PostMapping("/api/identity-service/v1/users/bulk-info")
     ApiResponse<List<UserResponse>> getUsersByIds(@RequestBody List<String> userIds);
 
-    // Bạn cần tạo class UserResponse bên lms-backend để hứng dữ liệu trả về
-    // (copy fields id, email từ identity-service sang)
     @Data
     @Builder
     @NoArgsConstructor
