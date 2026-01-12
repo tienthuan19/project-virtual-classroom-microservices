@@ -8,4 +8,7 @@ import lombok.Data;
 public class TeacherDashboardResponse {
     private long totalClassrooms;
     private long totalStudents;
+    private long totalAssignments; // Thêm
+    private double averageScore;   // Thêm
+    private double completionRate; // Thêm
 }
