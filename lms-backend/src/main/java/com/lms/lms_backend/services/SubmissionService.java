@@ -1,7 +1,7 @@
 package com.lms.lms_backend.services;
 
-import com.lms.lms_backend.dto.rabbitmq.EssayAnswerDto;
-import com.lms.lms_backend.dto.rabbitmq.SubmissionMessageDto;
+import com.lms.lms_backend.dto.rabbitmqDto.EssayAnswerDto;
+import com.lms.lms_backend.dto.rabbitmqDto.SubmissionMessageDto;
 import com.lms.lms_backend.dto.request.SubmissionRequest;
 import com.lms.lms_backend.models.Assignment;
 import com.lms.lms_backend.models.Question;
@@ -102,7 +102,6 @@ public class SubmissionService {
 
         } catch (Exception e) {
             System.err.println(">>> Failed to send to RabbitMQ: " + e.getMessage());
-            // Có thể throw exception để rollback transaction nếu yêu cầu bắt buộc phải gửi được
         }
         return "Submission received successfully";
     }
