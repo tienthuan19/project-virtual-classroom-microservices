@@ -7,6 +7,7 @@ import com.lms.lms_backend.services.ClassroomService;
 import com.lms.lms_backend.services.SubmissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -87,11 +88,9 @@ public class ClassroomController {
 
     @GetMapping("student/grades/{classroomId}")
     public ApiResponse<List<StudentGradeResponse>> getMyGrades(
-            @PathVariable String classroomId
+            @PathVariable String classroomId,
+            @AuthenticationPrincipal String studentId
     ) {
-        // Lấy userId từ Security Context do Filter đã set
-        String studentId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         return ApiResponse.<List<StudentGradeResponse>>builder()
                 .status(200)
                 .message("Get grades successfully")
