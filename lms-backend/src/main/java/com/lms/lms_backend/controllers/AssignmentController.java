@@ -79,4 +79,13 @@ public class AssignmentController {
                 .message(message)
                 .build();
     }
+    @DeleteMapping("/assignments/{assignmentId}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ApiResponse<Void> deleteAssignment(@PathVariable String assignmentId) {
+        assignmentService.deleteAssignment(assignmentId);
+        return ApiResponse.<Void>builder()
+                .status(200)
+                .message("Assignment deleted successfully")
+                .build();
+    }
 }

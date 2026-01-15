@@ -44,4 +44,13 @@ public class AnnouncementController {
                 .data(result)
                 .build();
     }
+    @DeleteMapping("/announcements/{announcementId}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ApiResponse<Void> deleteAnnouncement(@PathVariable String announcementId) {
+        announcementService.deleteAnnouncement(announcementId);
+        return ApiResponse.<Void>builder()
+                .status(200)
+                .message("Announcement deleted successfully")
+                .build();
+    }
 }

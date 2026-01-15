@@ -10,6 +10,7 @@ import com.lms.lms_backend.repository.ClassMemberRepository;
 import com.lms.lms_backend.repository.ClassroomRepository;
 import com.lms.lms_backend.repository.SubmissionRepository;
 import com.lms.lms_backend.repository.httpclient.IdentityClient;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -156,6 +157,23 @@ public class ClassroomService {
                     .joinedAt(member.getJoinedAt())
                     .build();
         }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteClassroom(String classroomId) {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Classroom classroom = classroomRepository.findById(classroomId)
+                .orElseThrow(() -> new RuntimeException("Classroom not found"));
+
+        if (!classroom.getCreatorId().equals(currentUserId)) {
+            throw new RuntimeException("You are not authorized to delete this classroom");
+        }
+
+        assignmentRepository.deleteByClassroomId(classroomId);
+        classMemberRepository.deleteByClassroomId(classroomId);
+
+        classroomRepository.delete(classroom);
     }
 }
 

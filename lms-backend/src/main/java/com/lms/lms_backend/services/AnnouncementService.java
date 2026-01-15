@@ -134,4 +134,22 @@ public class AnnouncementService {
                 .createdAt(a.getCreatedAt())
                 .build();
     }
+    @Transactional
+    public void deleteAnnouncement(String announcementId) {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Announcement announcement = announcementRepository.findById(announcementId)
+                .orElseThrow(() -> new RuntimeException("Announcement not found"));
+
+        boolean isSender = announcement.getSenderId().equals(currentUserId);
+        boolean isClassOwner = announcement.getClassroom().getCreatorId().equals(currentUserId);
+
+        if (!isSender && !isClassOwner) {
+            throw new RuntimeException("You are not authorized to delete this announcement");
+        }
+
+        notificationRepository.deleteByRelatedEntityId(announcementId);
+
+        announcementRepository.delete(announcement);
+    }
 }

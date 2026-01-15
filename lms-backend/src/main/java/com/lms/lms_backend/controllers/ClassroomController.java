@@ -97,4 +97,14 @@ public class ClassroomController {
                 .data(submissionService.getStudentGrades(classroomId, studentId))
                 .build();
     }
+
+    @DeleteMapping("/classrooms/{classroomId}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ApiResponse<Void> deleteClassroom(@PathVariable String classroomId) {
+        classroomService.deleteClassroom(classroomId);
+        return ApiResponse.<Void>builder()
+                .status(200)
+                .message("Classroom deleted successfully")
+                .build();
+    }
 }

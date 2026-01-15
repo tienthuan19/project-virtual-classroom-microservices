@@ -28,4 +28,5 @@ public interface SubmissionRepository extends JpaRepository<Submission, String> 
     Double findAverageScoreByTeacherId(String teacherId);
 
     Optional<Submission> findByAssignmentIdAndStudentId(String assignmentId, String studentId);
+    void deleteByAssignmentId(String assignmentId);
 }

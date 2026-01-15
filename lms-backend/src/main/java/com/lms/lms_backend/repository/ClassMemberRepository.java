@@ -17,4 +17,6 @@ public interface ClassMemberRepository extends JpaRepository<ClassMember, Long> 
             "JOIN cm.classroom c " +
             "WHERE c.creatorId = :creatorId")
     long countTotalStudentsByTeacher(@Param("creatorId") String creatorId);
+
+    void deleteByClassroomId(String classroomId);
 }

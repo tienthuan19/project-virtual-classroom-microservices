@@ -10,6 +10,8 @@ import com.lms.lms_backend.models.Classroom;
 import com.lms.lms_backend.models.Question;
 import com.lms.lms_backend.repository.AssignmentRepository;
 import com.lms.lms_backend.repository.ClassroomRepository;
+import com.lms.lms_backend.repository.NotificationRepository;
+import com.lms.lms_backend.repository.SubmissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ public class AssignmentService {
 
     private final AssignmentRepository assignmentRepository;
     private final ClassroomRepository classroomRepository;
+    private final SubmissionRepository submissionRepository;
+    private final NotificationRepository notificationRepository;
 
     @Transactional
     public AssignmentResponse createAssignment(String classroomId, CreateAssignmentRequest request) {
@@ -153,5 +157,22 @@ public class AssignmentService {
                 .maxScore(assignment.getMaxScore())
                 .numberOfQuestions(assignment.getQuestions() != null ? assignment.getQuestions().size() : 0)
                 .build();
+    }
+    @Transactional
+    public void deleteAssignment(String assignmentId) {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Assignment assignment = assignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new RuntimeException("Assignment not found"));
+
+        if (!assignment.getClassroom().getCreatorId().equals(currentUserId)) {
+            throw new RuntimeException("You are not authorized to delete this assignment");
+        }
+
+        submissionRepository.deleteByAssignmentId(assignmentId);
+
+        notificationRepository.deleteByRelatedEntityId(assignmentId);
+
+        assignmentRepository.delete(assignment);
     }
 }

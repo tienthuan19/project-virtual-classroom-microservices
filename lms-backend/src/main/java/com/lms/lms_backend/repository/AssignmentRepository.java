@@ -35,4 +35,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, String> 
             "WHERE c.creatorId = :teacherId " +
             "AND m.role = 'STUDENT'")           // Chỉ đếm học sinh, không đếm giáo viên/trợ giảng
     long countTotalExpectedSubmissionsByTeacherId(String teacherId);
+
+    void deleteByClassroomId(String classroomId);
 }
