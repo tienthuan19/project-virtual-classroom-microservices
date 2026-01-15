@@ -1,4 +1,4 @@
-package com.gateway.api_gateway;
+package com.swdesign.api_gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
