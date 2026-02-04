@@ -24,7 +24,7 @@ public class NotificationController {
                 .build();
     }
 
-    // PUT /api/v1/notifications/{id}/read -> Đánh dấu đã đọc
+    // PUT /api/v1/notifications/{id}/read
     @PutMapping("/{id}/read")
     public ApiResponse<Void> markAsRead(@PathVariable String id) {
         notificationService.markAsRead(id);
@@ -34,7 +34,7 @@ public class NotificationController {
                 .build();
     }
 
-    // GET /api/v1/notifications/unread-count -> Lấy số lượng chưa đọc (để hiển thị chấm đỏ)
+    // GET /api/v1/notifications/unread-count
     @GetMapping("/unread-count")
     public ApiResponse<Long> countUnread() {
         return ApiResponse.<Long>builder()

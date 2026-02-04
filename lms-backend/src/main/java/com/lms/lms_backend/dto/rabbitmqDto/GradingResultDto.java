@@ -12,5 +12,5 @@ public class GradingResultDto {
     private UUID submissionId;
     private Double scoreAi;
     private String feedback;
-    private List<GradingDetailDto> details; // 👈 Thêm cái này
+    private List<GradingDetailDto> details;
 }

@@ -16,7 +16,7 @@ public interface ClassroomRepository extends JpaRepository<Classroom, String> {
     Optional<Classroom> findByClassCode(String classCode);
     long countByCreatorId(String creatorId);
 
-
+    //TODO: Chuyển đổi từ set logic bên query sang cho Backend
     @Query("SELECT new com.lms.lms_backend.dto.response.ClassroomCardResponse(" +
             "c.id, " +
             "c.name, " +

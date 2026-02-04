@@ -67,7 +67,7 @@ public class AssignmentController {
     }
     // 4
     @PostMapping("/{assignmentId}/submit")
-    @PreAuthorize("hasRole('STUDENT')") // Chỉ học sinh mới được nộp
+    @PreAuthorize("hasRole('STUDENT')")
     public ApiResponse<String> submitAssignment(
             @PathVariable String assignmentId,
             @RequestBody SubmissionRequest request) {

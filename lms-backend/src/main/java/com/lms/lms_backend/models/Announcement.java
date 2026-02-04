@@ -16,15 +16,15 @@ public class Announcement extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    private String title; // Mới: Tiêu đề
+    private String title;
 
     @Column(columnDefinition = "TEXT")
     private String content;
 
     @Enumerated(EnumType.STRING)
-    private Priority priority; // Mới: Mức độ ưu tiên
+    private Priority priority;
 
-    private String attachmentUrl; // Mới: Link tệp đính kèm (PDF, Docx, img...)
+    private String attachmentUrl;
 
     private String senderId;
 

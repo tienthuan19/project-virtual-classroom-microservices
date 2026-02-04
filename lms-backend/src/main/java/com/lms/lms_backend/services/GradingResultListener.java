@@ -25,9 +25,6 @@ public class GradingResultListener {
     public void receiveGradingResult(GradingResultDto result) {
         System.out.println("<<< Received result from AI: " + result);
 
-        // 1. Tìm Submission
-        // LỖI TYPE: result.getSubmissionId() là UUID, nhưng repo cần String
-        // FIX: Thêm .toString()
         Submission submission = submissionRepository.findById(result.getSubmissionId().toString())
                 .orElse(null);
 
@@ -35,29 +32,20 @@ public class GradingResultListener {
             System.err.println("!!! Submission not found: " + result.getSubmissionId());
             return;
         }
-
-        // 2. Cập nhật thông tin tổng quan
         submission.setTotalScore(result.getScoreAi());
 
-        // FIX LỖI setFeedback: Đã thêm field này vào model Submission ở Bước 1
         submission.setFeedback(result.getFeedback());
 
-        // 3. Cập nhật chi tiết từng câu (Details)
         if (result.getDetails() != null && !result.getDetails().isEmpty()) {
 
-            // Map danh sách SubmissionDetail hiện có theo QuestionID (String)
-            // submissionDetails lấy từ DB, question.getId() trả về String
             Map<String, SubmissionDetail> detailMap = submission.getSubmissionDetails().stream()
                     .collect(Collectors.toMap(
-                            d -> d.getQuestion().getId(), // Key là String (ID câu hỏi)
+                            d -> d.getQuestion().getId(),
                             d -> d
                     ));
 
-            // Duyệt qua kết quả từ AI gửi về
             for (GradingDetailDto aiDetail : result.getDetails()) {
 
-                // LỖI TYPE: aiDetail.getQuestionId() là UUID, Map key là String
-                // FIX: Thêm .toString()
                 String questionIdStr = aiDetail.getQuestionId().toString();
 
                 SubmissionDetail dbDetail = detailMap.get(questionIdStr);
