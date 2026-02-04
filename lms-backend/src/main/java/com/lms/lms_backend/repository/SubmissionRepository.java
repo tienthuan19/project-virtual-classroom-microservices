@@ -11,16 +11,12 @@ import java.util.Optional;
 public interface SubmissionRepository extends JpaRepository<Submission, String> {
     boolean existsByAssignmentIdAndStudentId(String assignmentId, String studentId);
 
-    // 1. Đếm tổng số bài nộp (Submission) cho các bài tập của giáo viên này
-    // Đường đi: Submission -> Assignment -> Classroom -> Check Teacher
     @Query("SELECT COUNT(s) FROM Submission s " +
             "JOIN s.assignment a " +
             "JOIN a.classroom c " +
             "WHERE c.creatorId = :teacherId")
     long countSubmissionsByTeacherId(String teacherId);
 
-    // 2. Tính điểm trung bình (AVG) của toàn bộ bài nộp
-    // Sử dụng trường 'totalScore' từ Entity Submission bạn cung cấp
     @Query("SELECT AVG(s.totalScore) FROM Submission s " +
             "JOIN s.assignment a " +
             "JOIN a.classroom c " +

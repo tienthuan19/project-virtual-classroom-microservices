@@ -138,7 +138,7 @@ public class SubmissionService {
                 return StudentGradeResponse.builder()
                         .assignmentId(assignment.getId())
                         .assignmentTitle(assignment.getTitle())
-                        .maxScore(maxScoreVal) // <--- Đã sửa lỗi tại đây
+                        .maxScore(maxScoreVal)
                         .submissionId(null)
                         .score(null)
                         .feedback(null)

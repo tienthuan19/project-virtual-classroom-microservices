@@ -10,7 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-// Ideally, this should also extend BaseEntity if you want created_at/updated_at dates
 public class SubmissionDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
