@@ -6,8 +6,6 @@ There is a common frustration in everyday learning: while multiple-choice tests 
 
 This **AI-Powered School Management System** was built to solve that exact problem. Think of it as a "Virtual Teaching Assistant." It uses AI to read student essays, suggest a score based on the teacher's criteria, and generate detailed, constructive feedback. 
 
-**Most importantly:** The system acknowledges that AI isn't perfect. It is designed to assist teachers, not replace them. The AI does the heavy lifting, but the human teacher always has the final say in approving or modifying the official grade.
-
 ### Key Features
 * **Role-Based Access Control (RBAC):** Distinct workflows for Teachers and Students using stateless JWT authentication.
 * **Classroom & Assignment Management:** Teachers can create classes, manage students, and assign essay-based tasks.
@@ -18,17 +16,24 @@ This **AI-Powered School Management System** was built to solve that exact probl
 
 ## System Architecture & Design Approach
 
-This system was carefully planned using UML (Use Case, Sequence Diagrams) and Entity Relationship Diagrams (ERDs) to ensure scalable and decoupled components before any code was written. 
-
 The platform adopts a **Microservices Architecture** with asynchronous message-based integration to separate core academic workflows from computationally expensive AI processing.
 
 ![System Architecture Diagram](./docs/images/system-architecture-diagram.png)
 
 ### Core Components
-1. **API Gateway (Spring Cloud Gateway):** The single entry point for all client requests, routing traffic and enforcing security boundaries.
-2. **Authentication Service (Spring Boot):** Manages user identity, password hashing, RBAC, and issues JWTs. It exclusively owns the Identity Database.
-3. **Core LMS Service (Spring Boot):** Handles the core academic domain (classes, assignments, submissions). It owns the LMS Database. Logical references are used instead of physical cross-database foreign keys.
-4. **AI Grading Service (Python FastAPI):** A decoupled worker that consumes grading requests from the message queue, interacts with the Google Gemini API, and returns grading suggestions.
+
+To maintain strict service boundaries and independent deployment cycles, this project is split into two repositories:
+
+1. **[Main Repository: Core Services](https://github.com/tienthuan19/project-virtual-classroom-microservices.git)** (This repo)
+   * **Authentication Service (Spring Boot):** Manages user identity, password hashing, RBAC, and issues JWTs.
+   * **Core LMS Service (Spring Boot):** Handles the core academic domain (classes, assignments, submissions).
+   * **API Gateway**
+
+
+2. **[AI Grading Service Repository](https://github.com/tienthuan19/grading-ai-backend.git)**
+   * A decoupled worker that consumes grading requests from the message queue, interacts with the Google Gemini API, and returns grading suggestions.
+
+---
 
 ### Communication Flow
 * **Synchronous (REST/HTTP):** Used for interactive, latency-sensitive operations like login, joining classes, and submitting assignments.
@@ -62,15 +67,15 @@ Here is the workflow ensuring stateless authentication across services:
 
 ---
 
-## Tech Stack
-
-* **Backend Frameworks:** Java 21, Spring Boot 3.2.5, Spring Cloud Gateway.
-* **AI Service:** Python, FastAPI, Google Gemini API.
+* **Core Backend:** Java 21, Spring Boot 3.2.5, Spring Cloud Gateway.
+* **AI Grading Service:** Node.js, Express, Sequelize, Python FastAPI.
 * **Message Broker:** RabbitMQ.
 * **Database:** PostgreSQL (Database-per-service pattern).
 * **Security:** JWT (JSON Web Tokens), OAuth2.
-
 ---
+
+## **Most importantly:** 
+The system acknowledges that AI isn't perfect. It is designed to assist teachers, not replace them. The AI does the heavy lifting, but the human teacher always has the final say in approving or modifying the official grade.
 
 ## Key Design Decisions & Trade-offs
 
