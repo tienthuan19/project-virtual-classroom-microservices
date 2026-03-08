@@ -30,7 +30,7 @@ To maintain strict service boundaries and independent deployment cycles, this pr
    * **API Gateway**
 
 
-2. **[AI Grading Service Repository](https://github.com/tienthuan19/grading-ai-backend.git)**
+2. **[AI Grading Service Repository](https://github.com/tienthuan19/ai-grading-service.git)**
    * A decoupled worker that consumes grading requests from the message queue, interacts with the Google Gemini API, and returns grading suggestions.
 
 ---
