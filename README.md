@@ -67,8 +67,8 @@ Here is the workflow ensuring stateless authentication across services:
 
 ---
 
-* **Core Backend:** Java 21, Spring Boot 3.2.5, Spring Cloud Gateway.
-* **AI Grading Service:** Node.js, Express, Sequelize, Python FastAPI.
+* **Core Backend:** Java, Spring Boot.
+* **AI Grading Service:** Python FastAPI.
 * **Message Broker:** RabbitMQ.
 * **Database:** PostgreSQL (Database-per-service pattern).
 * **Security:** JWT (JSON Web Tokens), OAuth2.
